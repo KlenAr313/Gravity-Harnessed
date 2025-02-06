@@ -5,7 +5,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+# *.obj # In case used for 3D object files
 
 # Precompiled Headers
 *.gch
@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# Editor
+.vs
+.vscode
+
+# Other
+x64
