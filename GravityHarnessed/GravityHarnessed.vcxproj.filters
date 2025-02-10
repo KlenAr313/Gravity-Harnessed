@@ -22,6 +22,12 @@
     <Filter Include="GL Utils">
       <UniqueIdentifier>{e1d11d45-99ec-4d70-b229-4cd6b8c1ccc9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\SkyBox">
+      <UniqueIdentifier>{eedeba3d-5dd8-4b8c-8501-d7593b7e1844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\SkyBox2">
+      <UniqueIdentifier>{dd7f3522-7c70-45d1-af49-56a9027f92ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,6 +62,12 @@
     <None Include="Shaders\Vert_PosNormTex.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\SkyBox\Frag_skybox.frag">
+      <Filter>Shaders\SkyBox</Filter>
+    </None>
+    <None Include="Shaders\SkyBox\Vert_skybox.vert">
+      <Filter>Shaders\SkyBox</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Camera.h">
@@ -86,6 +98,24 @@
   <ItemGroup>
     <Image Include="Assets\color_checkerboard.png">
       <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\xneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\xpos.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\yneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\ypos.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\zneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\zpos.png">
+      <Filter>Assets\SkyBox2</Filter>
     </Image>
   </ItemGroup>
 </Project>

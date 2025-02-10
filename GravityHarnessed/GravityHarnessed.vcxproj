@@ -142,6 +142,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Frag_Lighting.frag" />
+    <None Include="Shaders\SkyBox\Frag_skybox.frag" />
+    <None Include="Shaders\SkyBox\Vert_skybox.vert" />
     <None Include="Shaders\Vert_PosNormTex.vert" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +158,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\color_checkerboard.png" />
+    <Image Include="Assets\SkyBox2\xneg.png" />
+    <Image Include="Assets\SkyBox2\xpos.png" />
+    <Image Include="Assets\SkyBox2\yneg.png" />
+    <Image Include="Assets\SkyBox2\ypos.png" />
+    <Image Include="Assets\SkyBox2\zneg.png" />
+    <Image Include="Assets\SkyBox2\zpos.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

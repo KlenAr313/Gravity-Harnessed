@@ -173,5 +173,17 @@ inline GLint ul( GLuint programID, const GLchar* uniformName ) noexcept
     return glGetUniformLocation( programID, uniformName );
 }
 
+inline GLint ul(const char* uniformName) noexcept
+{
+    GLuint programID = 0;
+
+    // Kérdezzük le az aktuális programot!
+    // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGet.xhtml
+    glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&programID));
+    // A program és a uniform név ismeretében kérdezzük le a location-t!
+    // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml
+    return glGetUniformLocation(programID, uniformName);
+}
+
 
 

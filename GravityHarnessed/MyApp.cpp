@@ -40,11 +40,17 @@ void CMyApp::InitShaders()
 		.ShaderStage( GL_FRAGMENT_SHADER, "Shaders/Frag_Lighting.frag" )
 		.Link();
 
+	m_ProgramSkyboxID = glCreateProgram();
+	ProgramBuilder{ m_ProgramSkyboxID }
+		.ShaderStage(GL_VERTEX_SHADER, "Shaders/SkyBox/Vert_skybox.vert")
+		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/SkyBox/Frag_skybox.frag")
+		.Link();
 }
 
 void CMyApp::CleanShaders()
 {
 	glDeleteProgram( m_programID );
+	glDeleteProgram(m_ProgramSkyboxID);
 }
 
 
@@ -82,11 +88,66 @@ void CMyApp::InitGeometry()
 
 	MeshObject<Vertex> SurfaceMeshCPU = GetParamSurfMesh( Param() );
 	m_SurfaceGPU = CreateGLObjectFromMesh( SurfaceMeshCPU, vertexAttribList );
+
+	InitSkyboxGeometry();
+}
+
+void CMyApp::InitSkyboxGeometry()
+{
+	// skybox geo
+	MeshObject<glm::vec3> skyboxCPU =
+	{
+		std::vector<glm::vec3>
+		{
+			// hátsó lap
+			glm::vec3(-1, -1, -1),
+			glm::vec3(1, -1, -1),
+			glm::vec3(1,  1, -1),
+			glm::vec3(-1,  1, -1),
+			// elülső lap
+			glm::vec3(-1, -1, 1),
+			glm::vec3(1, -1, 1),
+			glm::vec3(1,  1, 1),
+			glm::vec3(-1,  1, 1),
+		},
+
+		std::vector<GLuint>
+		{
+			// hátsó lap
+			0, 1, 2,
+			2, 3, 0,
+			// elülső lap
+			4, 6, 5,
+			6, 4, 7,
+			// bal
+			0, 3, 4,
+			4, 3, 7,
+			// jobb
+			1, 5, 2,
+			5, 6, 2,
+			// alsó
+			1, 0, 4,
+			1, 4, 5,
+			// felső
+			3, 2, 6,
+			3, 6, 7,
+		}
+	};
+
+	m_GPUSkybox = CreateGLObjectFromMesh(skyboxCPU, { { 0, offsetof(glm::vec3,x), 3, GL_FLOAT } });
+
+}
+
+void CMyApp::CleanSkyboxGeometry()
+{
+	CleanOGLObject(m_GPUSkybox);
 }
 
 void CMyApp::CleanGeometry()
 {
 	CleanOGLObject( m_SurfaceGPU );
+
+	CleanSkyboxGeometry();
 }
 
 void CMyApp::InitTextures()
@@ -108,11 +169,47 @@ void CMyApp::InitTextures()
 	glTextureSubImage2D( m_TextureID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data() );
 
 	glGenerateTextureMipmap( m_TextureID );
+
+	InitSkyboxTexture();
+}
+
+void CMyApp::InitSkyboxTexture()
+{
+	static const char* skyboxFiles[6] = {
+		"Assets/SkyBox2/xpos.png",
+		"Assets/SkyBox2/xneg.png",
+		"Assets/SkyBox2/ypos.png",
+		"Assets/SkyBox2/yneg.png",
+		"Assets/SkyBox2/zpos.png",
+		"Assets/SkyBox2/zneg.png",
+	};
+
+	ImageRGBA images[6];
+	for (int i = 0; i < 6; ++i)
+	{
+		images[i] = ImageFromFile(skyboxFiles[i], false);
+	}
+
+	glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_TextureSkyboxID);
+	glTextureStorage2D(m_TextureSkyboxID, 1, GL_RGBA8, images[0].width, images[0].height);
+
+	for (int face = 0; face < 6; ++face)
+	{
+		glTextureSubImage3D(m_TextureSkyboxID, 0, 0, 0, face, images[face].width, images[face].height, 1, GL_RGBA, GL_UNSIGNED_BYTE, images[face].data());
+	}
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
+void CMyApp::CleanSkyboxTexture()
+{
+	glDeleteTextures(1, &m_TextureSkyboxID);
 }
 
 void CMyApp::CleanTextures()
 {
 	glDeleteTextures( 1, &m_TextureID );
+
+	CleanSkyboxTexture();
 }
 
 bool CMyApp::Init()
@@ -225,6 +322,7 @@ void CMyApp::Render()
 					GL_UNSIGNED_INT,
 					nullptr );
 
+
 	// shader kikapcsolasa
 	glUseProgram( 0 );
 
@@ -234,6 +332,48 @@ void CMyApp::Render()
 
 	// VAO kikapcsolása
 	glBindVertexArray( 0 );
+
+	RenderSkybox();
+}
+
+void CMyApp::RenderSkybox()
+{
+	// - VAO
+	glBindVertexArray(m_GPUSkybox.vaoID);
+
+	// - Program
+	glUseProgram(m_ProgramSkyboxID);
+
+	// - uniform parameterek
+	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(glm::translate(m_camera.GetEye())));
+
+	// - textúraegységek beállítása
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_TextureSkyboxID);
+	glUniform1i(ul("skyboxTexture"), 0);
+
+	// mentsük el az előző Z-test eredményt, azaz azt a relációt, ami alapján update-eljük a pixelt.
+	GLint prevDepthFnc;
+	glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFnc);
+
+	// most kisebb-egyenlőt használjunk, mert mindent kitolunk a távoli vágósíkokra
+	glDepthFunc(GL_LEQUAL);
+
+	// Rajzolási parancs kiadása
+	glDrawElements(GL_TRIANGLES,
+		m_GPUSkybox.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+
+	glDepthFunc(prevDepthFnc);
+
+	// shader kikapcsolasa
+	glUseProgram(0);
+
+	// - Textúrák kikapcsolása, minden egységre külön
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CMyApp::RenderGUI()

@@ -98,8 +98,6 @@ protected:
 	// Geometria inicializálása, és törtlése
 	void InitGeometry();
 	void CleanGeometry();
-	void InitSkyboxGeometry();
-	void CleanSkyboxGeometry();
 
 	// Textúrázás, és változói
     GLuint m_SamplerID = 0;
@@ -108,5 +106,16 @@ protected:
 
 	void InitTextures();
 	void CleanTextures();
+
+	// Skybox
+	GLuint m_ProgramSkyboxID = 0;
+	OGLObject m_GPUSkybox = {};
+	void InitSkyboxGeometry();
+	void CleanSkyboxGeometry();
+	GLuint m_TextureSkyboxID = 0;
+	void InitSkyboxTexture();
+	void CleanSkyboxTexture();
+	void RenderSkybox();
+
 };
 
