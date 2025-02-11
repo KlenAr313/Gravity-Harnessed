@@ -117,7 +117,7 @@ protected:
 
 	// Earth
 	GLuint m_TextureColorEarthID = 0;
-	GLuint m_TextureHeightEartID = 0;
+	GLuint m_TextureHeightEarthID = 0;
 
 };
 

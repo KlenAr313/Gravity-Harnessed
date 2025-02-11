@@ -80,11 +80,11 @@ void CMyApp::InitGeometry()
 	const std::initializer_list<VertexAttributeDescriptor> vertexAttribList =
 	{
 		{ 0, offsetof( Vertex, position ), 3, GL_FLOAT },
-		{ 1, offsetof( Vertex, normal   ), 3, GL_FLOAT },
-		{ 2, offsetof( Vertex, texcoord ), 2, GL_FLOAT },
+		// { 1, offsetof( Vertex, normal   ), 3, GL_FLOAT },
+		{ 1, offsetof( Vertex, texcoord ), 2, GL_FLOAT },
 	};
 
-	// Suzanne
+	// Surface
 
 	MeshObject<Vertex> SurfaceMeshCPU = GetParamSurfMesh( Param() );
 	m_SurfaceGPU = CreateGLObjectFromMesh( SurfaceMeshCPU, vertexAttribList );
@@ -176,6 +176,13 @@ void CMyApp::InitTextures()
 	glTextureStorage2D(m_TextureColorEarthID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
 	glTextureSubImage2D(m_TextureColorEarthID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
 	glGenerateTextureMipmap(m_TextureColorEarthID);
+
+
+	Image = ImageFromFile("Assets/Earth/heightMapTex.png");
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureHeightEarthID);
+	glTextureStorage2D(m_TextureHeightEarthID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
+	glTextureSubImage2D(m_TextureHeightEarthID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
+	glGenerateTextureMipmap(m_TextureHeightEarthID);
 
 
 
@@ -280,9 +287,9 @@ void CMyApp::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//
-	// Suzanne
+	// Earth
 	//
-	// 
+	
     // - Program
 	glUseProgram(m_programID);
 
@@ -296,14 +303,20 @@ void CMyApp::Render()
     glUniformMatrix4fv(ul("world" ), 1, GL_FALSE, glm::value_ptr( matWorld ) );
     glUniformMatrix4fv(ul("worldIT" ), 1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
 
-    glUniform1f(ul("Shininess" ), m_Shininess );
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_TextureColorEarthID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_TextureHeightEarthID);
 
     // - textúraegységek beállítása
-    glUniform1i(ul( "texImage" ), 0 );
+    glUniform1i(ul( "colorTexImage" ), 0 );
+    glUniform1i(ul( "heightTexImage" ), 1 );
 
 	// - Textúrák beállítása, minden egységre külön
-	glBindTextureUnit( 0, m_TextureColorEarthID);
-	glBindSampler( 0, m_SamplerID );
+	//glBindTextureUnit( 0, m_TextureColorEarthID);
+	//glBindSampler( 0, m_SamplerID );
+	//glBindTextureUnit( 1, m_TextureHeightEarthID);
+	//glBindSampler( 1, m_SamplerID );
 
     // - VAO
 	glBindVertexArray( m_SurfaceGPU.vaoID );
@@ -322,6 +335,7 @@ void CMyApp::Render()
 
 	// - Textúrák kikapcsolása, minden egységre külön
 	glBindTextureUnit( 0, 0 );
+	glBindTextureUnit( 1, 0 );
 	glBindSampler( 0, 0 );
 
 	// VAO kikapcsolása

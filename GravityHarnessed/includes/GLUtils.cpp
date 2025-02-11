@@ -222,3 +222,16 @@ void CleanOGLObject( OGLObject& ObjectGPU )
 	glDeleteVertexArrays(1, &ObjectGPU.vaoID);
 	ObjectGPU.vaoID = 0;
 }
+
+void SetupTextureSampling(GLenum Target, GLuint textureID, bool generateMipMap)
+{
+	// mintavételezés beállításai
+	glBindTexture(Target, textureID);
+	if (generateMipMap) glGenerateMipmap(Target); // Mipmap generálása
+	glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // bilineáris szürés nagyításkor (ez az alapértelmezett)
+	glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, generateMipMap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR); // trilineáris szűrés a mipmap-ekböl kicsinyítéskor
+	// mi legyen az eredmény, ha a textúrán kívülröl próbálunk mintát venni?
+	glTexParameteri(Target, GL_TEXTURE_WRAP_S, GL_REPEAT); // vízszintesen
+	glTexParameteri(Target, GL_TEXTURE_WRAP_T, GL_REPEAT); // függölegesen
+	glBindTexture(Target, 0);
+}

@@ -9,7 +9,7 @@ in vec2 vs_out_tex;
 out vec4 fs_out_col;
 
 // textúra mintavételező objektum
-uniform sampler2D texImage;
+uniform sampler2D colorTexImage;
 
 uniform vec3 cameraPos;
 
@@ -92,5 +92,5 @@ void main()
 
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );
-	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * texture(texImage, vs_out_tex);
+	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * texture(colorTexImage, vs_out_tex);
 }
