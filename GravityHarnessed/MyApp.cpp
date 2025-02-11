@@ -170,6 +170,15 @@ void CMyApp::InitTextures()
 
 	glGenerateTextureMipmap( m_TextureID );
 
+	// Earth
+	Image = ImageFromFile("Assets/Earth/colorTex.jpg");
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureColorEarthID);
+	glTextureStorage2D(m_TextureColorEarthID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
+	glTextureSubImage2D(m_TextureColorEarthID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
+	glGenerateTextureMipmap(m_TextureColorEarthID);
+
+
+
 	InitSkyboxTexture();
 }
 
@@ -273,48 +282,33 @@ void CMyApp::Render()
 	//
 	// Suzanne
 	//
+	// 
+    // - Program
+	glUseProgram(m_programID);
 
     // - Uniform paraméterek
     // view és projekciós mátrix
-    glProgramUniformMatrix4fv( m_programID, ul( m_programID, "viewProj" ), 1, GL_FALSE, glm::value_ptr( m_camera.GetViewProj() ) );
+    glUniformMatrix4fv(ul("viewProj" ), 1, GL_FALSE, glm::value_ptr( m_camera.GetViewProj() ) );
 
 
-    glm::mat4 matWorld = glm::translate( SUZANNE_POS );
+    glm::mat4 matWorld = glm::identity<glm::mat4>();
 
-    glProgramUniformMatrix4fv( m_programID, ul( m_programID, "world" ), 1, GL_FALSE, glm::value_ptr( matWorld ) );
-    glProgramUniformMatrix4fv( m_programID, ul( m_programID, "worldIT" ), 1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
+    glUniformMatrix4fv(ul("world" ), 1, GL_FALSE, glm::value_ptr( matWorld ) );
+    glUniformMatrix4fv(ul("worldIT" ), 1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
 
-    // - Fényforrások beállítása
-    glProgramUniform3fv( m_programID, ul( m_programID, "cameraPos" ), 1, glm::value_ptr( m_camera.GetEye() ) );
-    glProgramUniform4fv( m_programID, ul( m_programID, "lightPos" ), 1, glm::value_ptr( m_lightPos ) );
-
-    glProgramUniform3fv( m_programID, ul( m_programID, "La" ), 1, glm::value_ptr( m_La ) );
-    glProgramUniform3fv( m_programID, ul( m_programID, "Ld" ), 1, glm::value_ptr( m_Ld ) );
-    glProgramUniform3fv( m_programID, ul( m_programID, "Ls" ), 1, glm::value_ptr( m_Ls ) );
-
-    glProgramUniform1f( m_programID, ul( m_programID, "lightConstantAttenuation" ), m_lightConstantAttenuation );
-    glProgramUniform1f( m_programID, ul( m_programID, "lightLinearAttenuation" ), m_lightLinearAttenuation );
-    glProgramUniform1f( m_programID, ul( m_programID, "lightQuadraticAttenuation" ), m_lightQuadraticAttenuation );
-
-    // - Anyagjellemzők beállítása
-    glProgramUniform3fv( m_programID, ul( m_programID, "Ka" ), 1, glm::value_ptr( m_Ka ) );
-    glProgramUniform3fv( m_programID, ul( m_programID, "Kd" ), 1, glm::value_ptr( m_Kd ) );
-    glProgramUniform3fv( m_programID, ul( m_programID, "Ks" ), 1, glm::value_ptr( m_Ks ) );
-
-    glProgramUniform1f( m_programID, ul( m_programID, "Shininess" ), m_Shininess );
+    glUniform1f(ul("Shininess" ), m_Shininess );
 
     // - textúraegységek beállítása
-    glProgramUniform1i( m_programID, ul( m_programID, "texImage" ), 0 );
+    glUniform1i(ul( "texImage" ), 0 );
 
 	// - Textúrák beállítása, minden egységre külön
-	glBindTextureUnit( 0, m_TextureID );
+	glBindTextureUnit( 0, m_TextureColorEarthID);
 	glBindSampler( 0, m_SamplerID );
 
     // - VAO
 	glBindVertexArray( m_SurfaceGPU.vaoID );
 
-    // - Program
-	glUseProgram( m_programID );
+	SetLightning();
 
 	// Rajzolási parancs kiadása
 	glDrawElements( GL_TRIANGLES,    
@@ -374,6 +368,28 @@ void CMyApp::RenderSkybox()
 	// - Textúrák kikapcsolása, minden egységre külön
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void CMyApp::SetLightning()
+{
+	// - Fényforrások beállítása
+	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
+	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
+
+	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
+	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
+	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
+
+	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
+	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
+	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
+
+	// - Anyagjellemzők beállítása
+	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
+	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
+	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
+
+	glUniform1f(ul("Shininess"), m_Shininess);
 }
 
 void CMyApp::RenderGUI()

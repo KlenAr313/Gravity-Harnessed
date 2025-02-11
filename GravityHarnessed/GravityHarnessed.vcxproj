@@ -158,6 +158,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\color_checkerboard.png" />
+    <Image Include="Assets\Earth\colorTex.jpg" />
+    <Image Include="Assets\Earth\heightMapTex.png" />
     <Image Include="Assets\SkyBox2\xneg.png" />
     <Image Include="Assets\SkyBox2\xpos.png" />
     <Image Include="Assets\SkyBox2\yneg.png" />

@@ -28,6 +28,9 @@
     <Filter Include="Assets\SkyBox2">
       <UniqueIdentifier>{dd7f3522-7c70-45d1-af49-56a9027f92ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Earth">
+      <UniqueIdentifier>{1b43078d-422a-482d-8ba1-7c3bf9632934}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -116,6 +119,12 @@
     </Image>
     <Image Include="Assets\SkyBox2\zpos.png">
       <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\Earth\colorTex.jpg">
+      <Filter>Assets\Earth</Filter>
+    </Image>
+    <Image Include="Assets\Earth\heightMapTex.png">
+      <Filter>Assets\Earth</Filter>
     </Image>
   </ItemGroup>
 </Project>

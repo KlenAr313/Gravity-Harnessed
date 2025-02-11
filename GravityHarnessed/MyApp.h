@@ -54,10 +54,6 @@ protected:
 
 	float m_ElapsedTimeInSec = 0.0f;
 
-	// Suzanne params
-
-	static constexpr glm::vec3 SUZANNE_POS = glm::vec3( 0.0f, 0.0f, 0.0f );
-
 	// Kamera
 	Camera m_camera;
 	CameraManipulator m_cameraManipulator;
@@ -86,6 +82,8 @@ protected:
 	glm::vec3 m_Ks = glm::vec3( 1.0 );
 
 	float m_Shininess = 1.0;
+
+	void SetLightning();
 
 	// Shaderek inicializálása, és törtlése
 	void InitShaders();
@@ -116,6 +114,10 @@ protected:
 	void InitSkyboxTexture();
 	void CleanSkyboxTexture();
 	void RenderSkybox();
+
+	// Earth
+	GLuint m_TextureColorEarthID = 0;
+	GLuint m_TextureHeightEartID = 0;
 
 };
 
