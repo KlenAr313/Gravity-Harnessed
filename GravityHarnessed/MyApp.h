@@ -124,6 +124,7 @@ protected:
 	GLuint m_ProgramSunID = 0;
 	GLuint m_TextureColorSunID = 0;
 	GLuint m_TextureHeightSunID = 0;
+	float sunDistortionSpped = 0.1;
 	void RenderSun();
 
 };

@@ -16,6 +16,8 @@ uniform mat4 viewProj;
 uniform sampler2D colorTexImage;
 uniform sampler2D heightTexImage;
 
+uniform float noiseTranslate;
+
 float r = 1.0;
 
 vec3 GetPos(float u, float udif, float v, float vdif, vec2 temp_tex);
@@ -35,13 +37,20 @@ void main()
 	vs_out_tex.y = 1 - vs_out_tex.y;
 	vs_out_tex.x = 1 - vs_out_tex.x;
 
-	if(vs_in_tex.x == 1.0)
+	vec2 hei_tex = vs_out_tex;
+	hei_tex.x += noiseTranslate;
+
+	if(vs_out_tex.x == 1.0)
 	{
-		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(0.0, vs_in_tex.y))) * 0.1);
+		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(0.0 + noiseTranslate, hei_tex.y))) * 0.1);
+	}
+	else if (vs_out_tex.x == 0.0)
+	{
+		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(0.0 + noiseTranslate, hei_tex.y))) * 0.1);
 	}
 	else
 	{
-		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(vs_in_tex.x * sin(vs_in_tex.y * 3.1415), vs_in_tex.y))) * 0.1);
+		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(hei_tex.x * sin(hei_tex.y * 3.1415), hei_tex.y))) * 0.1);
 	}
 
 	gl_Position = viewProj * world * vec4( vs_out_pos, 1 );

@@ -201,8 +201,8 @@ void CMyApp::InitTextures()
 	glGenerateTextureMipmap(m_TextureColorSunID);
 
 
-	Image = ImageFromFile("Assets/Sun/sunHeightTex.png");
-	//Image = ImageFromFile("Assets/Sun/noiseTexture.png");
+	//Image = ImageFromFile("Assets/Sun/sunHeightTex.png");
+	Image = ImageFromFile("Assets/Sun/noiseTexture.png");
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureHeightSunID);
 	glTextureStorage2D(m_TextureHeightSunID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
 	glTextureSubImage2D(m_TextureHeightSunID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
@@ -340,6 +340,9 @@ void CMyApp::RenderSun()
 	glm::mat4 matWorld = glm::identity<glm::mat4>();
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+
+	//float move = remainder( (m_ElapsedTimeInSec * sunDistortionSpped), 1.0);
+	glUniform1f(ul("noiseTranslate"), m_ElapsedTimeInSec * sunDistortionSpped);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_TextureColorSunID);
