@@ -43,7 +43,7 @@ void CMyApp::InitShaders()
 	m_ProgramSunID = glCreateProgram();
 	ProgramBuilder{ m_ProgramSunID }
 		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Vert_SunPosNormTex.vert")
-		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Frag_Lighting.frag")
+		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Frag_Sun.frag")
 		.Link();
 
 	m_ProgramSkyboxID = glCreateProgram();
@@ -306,7 +306,7 @@ void CMyApp::Render()
 	// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	RenderEarth();
+	//RenderEarth();
 
 	RenderSun();
 
@@ -333,11 +333,9 @@ void CMyApp::RenderSun()
 	// view és projekciós mátrix
 	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
 
-
 	glm::mat4 matWorld = glm::identity<glm::mat4>();
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
-	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_TextureColorSunID);
@@ -350,8 +348,6 @@ void CMyApp::RenderSun()
 
 	// - VAO
 	glBindVertexArray(m_SurfaceGPU.vaoID);
-
-	SetLightning();
 
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,

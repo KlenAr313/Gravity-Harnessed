@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Frag_Lighting.frag" />
+    <None Include="Shaders\Frag_Sun.frag" />
     <None Include="Shaders\SkyBox\Frag_skybox.frag" />
     <None Include="Shaders\SkyBox\Vert_skybox.vert" />
     <None Include="Shaders\Vert_PlanetPosNormTex.vert" />

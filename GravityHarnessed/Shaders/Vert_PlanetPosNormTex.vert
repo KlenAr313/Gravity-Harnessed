@@ -22,6 +22,7 @@ float r = 1.0;
 
 vec3 GetPos(float u, float udif, float v, float vdif, vec2 temp_tex);
 
+// PLANET
 void main()
 {
 	float u = vs_in_pos.x * 3.1415 * 2;
