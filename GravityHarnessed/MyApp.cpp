@@ -34,18 +34,21 @@ void CMyApp::SetupDebugCallback()
 
 void CMyApp::InitShaders()
 {
+	// Planet
 	m_ProgramPlanetID = glCreateProgram();
 	ProgramBuilder{ m_ProgramPlanetID }
 		.ShaderStage( GL_VERTEX_SHADER, "Shaders/Vert_PlanetPosNormTex.vert" )
 		.ShaderStage( GL_FRAGMENT_SHADER, "Shaders/Frag_Lighting.frag" )
 		.Link();
 
+	// Sun
 	m_ProgramSunID = glCreateProgram();
 	ProgramBuilder{ m_ProgramSunID }
-		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Vert_SunPosNormTex.vert")
+		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Vert_SunPosTex.vert")
 		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Frag_Sun.frag")
 		.Link();
 
+	// Skybox
 	m_ProgramSkyboxID = glCreateProgram();
 	ProgramBuilder{ m_ProgramSkyboxID }
 		.ShaderStage(GL_VERTEX_SHADER, "Shaders/SkyBox/Vert_skybox.vert")
@@ -199,6 +202,7 @@ void CMyApp::InitTextures()
 
 
 	Image = ImageFromFile("Assets/Sun/sunHeightTex.png");
+	//Image = ImageFromFile("Assets/Sun/noiseTexture.png");
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureHeightSunID);
 	glTextureStorage2D(m_TextureHeightSunID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
 	glTextureSubImage2D(m_TextureHeightSunID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());

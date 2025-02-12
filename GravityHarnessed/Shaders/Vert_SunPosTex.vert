@@ -23,7 +23,7 @@ vec3 GetPos(float u, float udif, float v, float vdif, vec2 temp_tex);
 // SUN
 void main()
 {
-	float u = vs_in_pos.x * 3.1415 * 2;
+	float u = vs_in_pos.x * 3.1415 * 2.0001 ;
 	float v = vs_in_pos.y * 3.1415;
 
 	vs_out_pos = vec3( 
@@ -35,7 +35,14 @@ void main()
 	vs_out_tex.y = 1 - vs_out_tex.y;
 	vs_out_tex.x = 1 - vs_out_tex.x;
 
-	vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vs_out_tex * 10.0)) * 0.1);
+	if(vs_in_tex.x == 1.0)
+	{
+		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(0.0, vs_in_tex.y))) * 0.1);
+	}
+	else
+	{
+		vs_out_pos = vs_out_pos * (1.0 + length(texture(heightTexImage, vec2(vs_in_tex.x * sin(vs_in_tex.y * 3.1415), vs_in_tex.y))) * 0.1);
+	}
 
 	gl_Position = viewProj * world * vec4( vs_out_pos, 1 );
 	vs_out_pos  = (world   * vec4(vs_out_pos,  1)).xyz;

@@ -74,7 +74,7 @@
     <None Include="Shaders\SkyBox\Vert_skybox.vert">
       <Filter>Shaders\SkyBox</Filter>
     </None>
-    <None Include="Shaders\Vert_SunPosNormTex.vert">
+    <None Include="Shaders\Vert_SunPosTex.vert">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Frag_Sun.frag">
@@ -139,6 +139,9 @@
       <Filter>Assets\Sun</Filter>
     </Image>
     <Image Include="Assets\Sun\sunHeightTex.png">
+      <Filter>Assets\Sun</Filter>
+    </Image>
+    <Image Include="Assets\Sun\noiseTexture.png">
       <Filter>Assets\Sun</Filter>
     </Image>
   </ItemGroup>
