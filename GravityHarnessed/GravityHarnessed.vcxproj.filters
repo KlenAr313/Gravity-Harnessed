@@ -31,6 +31,9 @@
     <Filter Include="Assets\Earth">
       <UniqueIdentifier>{1b43078d-422a-482d-8ba1-7c3bf9632934}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Sun">
+      <UniqueIdentifier>{324e4dcb-567a-4e25-9c5d-696c1699ec9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,7 +65,7 @@
     <None Include="Shaders\Frag_Lighting.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\Vert_PosNormTex.vert">
+    <None Include="Shaders\Vert_PlanetPosNormTex.vert">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\SkyBox\Frag_skybox.frag">
@@ -70,6 +73,9 @@
     </None>
     <None Include="Shaders\SkyBox\Vert_skybox.vert">
       <Filter>Shaders\SkyBox</Filter>
+    </None>
+    <None Include="Shaders\Vert_SunPosNormTex.vert">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +131,12 @@
     </Image>
     <Image Include="Assets\Earth\heightMapTex.png">
       <Filter>Assets\Earth</Filter>
+    </Image>
+    <Image Include="Assets\Sun\sunColorTex.jpg">
+      <Filter>Assets\Sun</Filter>
+    </Image>
+    <Image Include="Assets\Sun\sunHeightTex.png">
+      <Filter>Assets\Sun</Filter>
     </Image>
   </ItemGroup>
 </Project>

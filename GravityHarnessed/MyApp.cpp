@@ -34,10 +34,16 @@ void CMyApp::SetupDebugCallback()
 
 void CMyApp::InitShaders()
 {
-	m_programID = glCreateProgram();
-	ProgramBuilder{ m_programID }
-		.ShaderStage( GL_VERTEX_SHADER, "Shaders/Vert_PosNormTex.vert" )
+	m_ProgramPlanetID = glCreateProgram();
+	ProgramBuilder{ m_ProgramPlanetID }
+		.ShaderStage( GL_VERTEX_SHADER, "Shaders/Vert_PlanetPosNormTex.vert" )
 		.ShaderStage( GL_FRAGMENT_SHADER, "Shaders/Frag_Lighting.frag" )
+		.Link();
+
+	m_ProgramSunID = glCreateProgram();
+	ProgramBuilder{ m_ProgramSunID }
+		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Vert_SunPosNormTex.vert")
+		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Frag_Lighting.frag")
 		.Link();
 
 	m_ProgramSkyboxID = glCreateProgram();
@@ -49,7 +55,7 @@ void CMyApp::InitShaders()
 
 void CMyApp::CleanShaders()
 {
-	glDeleteProgram( m_programID );
+	glDeleteProgram( m_ProgramPlanetID );
 	glDeleteProgram(m_ProgramSkyboxID);
 }
 
@@ -184,6 +190,20 @@ void CMyApp::InitTextures()
 	glTextureSubImage2D(m_TextureHeightEarthID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
 	glGenerateTextureMipmap(m_TextureHeightEarthID);
 
+	// Sun
+	Image = ImageFromFile("Assets/Sun/sunColorTex.jpg");
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureColorSunID);
+	glTextureStorage2D(m_TextureColorSunID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
+	glTextureSubImage2D(m_TextureColorSunID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
+	glGenerateTextureMipmap(m_TextureColorSunID);
+
+
+	Image = ImageFromFile("Assets/Sun/sunHeightTex.png");
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureHeightSunID);
+	glTextureStorage2D(m_TextureHeightSunID, NumberOfMIPLevels(Image), GL_RGBA8, Image.width, Image.height);
+	glTextureSubImage2D(m_TextureHeightSunID, 0, 0, 0, Image.width, Image.height, GL_RGBA, GL_UNSIGNED_BYTE, Image.data());
+	glGenerateTextureMipmap(m_TextureHeightSunID);
+
 
 
 	InitSkyboxTexture();
@@ -286,49 +306,9 @@ void CMyApp::Render()
 	// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//
-	// Earth
-	//
-	
-    // - Program
-	glUseProgram(m_programID);
+	RenderEarth();
 
-    // - Uniform paraméterek
-    // view és projekciós mátrix
-    glUniformMatrix4fv(ul("viewProj" ), 1, GL_FALSE, glm::value_ptr( m_camera.GetViewProj() ) );
-
-
-    glm::mat4 matWorld = glm::identity<glm::mat4>();
-
-    glUniformMatrix4fv(ul("world" ), 1, GL_FALSE, glm::value_ptr( matWorld ) );
-    glUniformMatrix4fv(ul("worldIT" ), 1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_TextureColorEarthID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_TextureHeightEarthID);
-
-    // - textúraegységek beállítása
-    glUniform1i(ul( "colorTexImage" ), 0 );
-    glUniform1i(ul( "heightTexImage" ), 1 );
-
-	// - Textúrák beállítása, minden egységre külön
-	//glBindTextureUnit( 0, m_TextureColorEarthID);
-	//glBindSampler( 0, m_SamplerID );
-	//glBindTextureUnit( 1, m_TextureHeightEarthID);
-	//glBindSampler( 1, m_SamplerID );
-
-    // - VAO
-	glBindVertexArray( m_SurfaceGPU.vaoID );
-
-	SetLightning();
-
-	// Rajzolási parancs kiadása
-	glDrawElements( GL_TRIANGLES,    
-					m_SurfaceGPU.count,			 
-					GL_UNSIGNED_INT,
-					nullptr );
-
+	RenderSun();
 
 	// shader kikapcsolasa
 	glUseProgram( 0 );
@@ -342,6 +322,84 @@ void CMyApp::Render()
 	glBindVertexArray( 0 );
 
 	RenderSkybox();
+}
+
+void CMyApp::RenderSun()
+{
+	// - Program
+	glUseProgram(m_ProgramSunID);
+
+	// - Uniform paraméterek
+	// view és projekciós mátrix
+	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
+
+
+	glm::mat4 matWorld = glm::identity<glm::mat4>();
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_TextureColorSunID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_TextureHeightSunID);
+
+	// - textúraegységek beállítása
+	glUniform1i(ul("colorTexImage"), 0);
+	glUniform1i(ul("heightTexImage"), 1);
+
+	// - VAO
+	glBindVertexArray(m_SurfaceGPU.vaoID);
+
+	SetLightning();
+
+	// Rajzolási parancs kiadása
+	glDrawElements(GL_TRIANGLES,
+		m_SurfaceGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+}
+
+void CMyApp::RenderEarth()
+{
+	// - Program
+	glUseProgram(m_ProgramPlanetID);
+
+	// - Uniform paraméterek
+	// view és projekciós mátrix
+	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
+
+
+	glm::mat4 matWorld = glm::translate(glm::vec3(2,0,0));
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_TextureColorEarthID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_TextureHeightEarthID);
+
+	// - textúraegységek beállítása
+	glUniform1i(ul("colorTexImage"), 0);
+	glUniform1i(ul("heightTexImage"), 1);
+
+	// - Textúrák beállítása, minden egységre külön
+	//glBindTextureUnit( 0, m_TextureColorEarthID);
+	//glBindSampler( 0, m_SamplerID );
+	//glBindTextureUnit( 1, m_TextureHeightEarthID);
+	//glBindSampler( 1, m_SamplerID );
+
+	// - VAO
+	glBindVertexArray(m_SurfaceGPU.vaoID);
+
+	SetLightning();
+
+	// Rajzolási parancs kiadása
+	glDrawElements(GL_TRIANGLES,
+		m_SurfaceGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
 }
 
 void CMyApp::RenderSkybox()

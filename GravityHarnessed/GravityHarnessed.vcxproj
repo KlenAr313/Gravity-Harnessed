@@ -144,7 +144,8 @@
     <None Include="Shaders\Frag_Lighting.frag" />
     <None Include="Shaders\SkyBox\Frag_skybox.frag" />
     <None Include="Shaders\SkyBox\Vert_skybox.vert" />
-    <None Include="Shaders\Vert_PosNormTex.vert" />
+    <None Include="Shaders\Vert_PlanetPosNormTex.vert" />
+    <None Include="Shaders\Vert_SunPosNormTex.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Camera.h" />
@@ -166,6 +167,8 @@
     <Image Include="Assets\SkyBox2\ypos.png" />
     <Image Include="Assets\SkyBox2\zneg.png" />
     <Image Include="Assets\SkyBox2\zpos.png" />
+    <Image Include="Assets\Sun\sunColorTex.jpg" />
+    <Image Include="Assets\Sun\sunHeightTex.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

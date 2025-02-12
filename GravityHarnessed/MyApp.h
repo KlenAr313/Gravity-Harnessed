@@ -63,7 +63,7 @@ protected:
 	//
 	
 	// shaderekhez szükséges változók
-	GLuint m_programID = 0;		  // shaderek programja
+	GLuint m_ProgramPlanetID = 0;		  // Program for planet
 
 	// Fényforrás- ...
 	glm::vec4 m_lightPos = glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f );
@@ -118,6 +118,13 @@ protected:
 	// Earth
 	GLuint m_TextureColorEarthID = 0;
 	GLuint m_TextureHeightEarthID = 0;
+	void RenderEarth();
+
+	// Sun
+	GLuint m_ProgramSunID = 0;
+	GLuint m_TextureColorSunID = 0;
+	GLuint m_TextureHeightSunID = 0;
+	void RenderSun();
 
 };
 
