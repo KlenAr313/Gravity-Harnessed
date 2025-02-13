@@ -124,8 +124,17 @@ protected:
 	GLuint m_ProgramSunID = 0;
 	GLuint m_TextureColorSunID = 0;
 	GLuint m_TextureHeightSunID = 0;
-	float sunDistortionSpped = 0.08;
+	float sunDistortionSpped = 0.08f;
 	void RenderSun();
+
+	// FBO for bloom
+	void InitFBOs();
+	void CleanFBOs();
+	void InitResolutionDependentResources(int wiidth, int height);
+	void CleanResolutionDependentResources();
+	GLuint m_ImageFBO = 0;
+	GLuint m_colorBuffers[2] = { 0,0 };
+
 
 };
 

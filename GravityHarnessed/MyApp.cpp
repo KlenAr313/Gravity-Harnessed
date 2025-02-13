@@ -252,6 +252,55 @@ void CMyApp::CleanTextures()
 	CleanSkyboxTexture();
 }
 
+void CMyApp::InitFBOs()
+{
+	glCreateFramebuffers(1, &m_ImageFBO);
+}
+
+void CMyApp::CleanFBOs()
+{
+	glDeleteFramebuffers(1, &m_ImageFBO);
+}
+
+void CMyApp::InitResolutionDependentResources(int width, int height)
+{
+	//glBindFramebuffer(GL_FRAMEBUFFER, m_ImageFBO);
+	glCreateTextures(GL_TEXTURE_2D, 2, m_colorBuffers);
+	for (unsigned int i = 0; i < 2; i++)
+	{
+		glTextureStorage2D(m_colorBuffers[i], 1, GL_RGBA16F, width, height);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_colorBuffers[i], 0);
+		glNamedFramebufferTexture(m_ImageFBO, GL_COLOR_ATTACHMENT0, m_colorBuffers[i], 0);
+	}
+
+	GLenum status = glCheckNamedFramebufferStatus(m_ImageFBO, GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		switch (status) {
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT!");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT!");
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_UNSUPPORTED!");
+			break;
+		}
+	}
+}
+
+void CMyApp::CleanResolutionDependentResources()
+{
+	glDeleteTextures(2, m_colorBuffers);
+}
+
 bool CMyApp::Init()
 {
 	SetupDebugCallback();
@@ -265,6 +314,8 @@ bool CMyApp::Init()
 	InitShaders();
 	InitGeometry();
 	InitTextures();
+
+	InitFBOs();
 
 	//
 	// egyéb inicializálás
@@ -291,6 +342,8 @@ void CMyApp::Clean()
 	CleanShaders();
 	CleanGeometry();
 	CleanTextures();
+	CleanResolutionDependentResources();
+	CleanFBOs();
 }
 
 void CMyApp::Update( const SUpdateInfo& updateInfo )
@@ -573,6 +626,9 @@ void CMyApp::Resize(int _w, int _h)
 {
 	glViewport(0, 0, _w, _h);
 	m_camera.SetAspect( static_cast<float>(_w) / _h );
+
+	CleanResolutionDependentResources();
+	InitResolutionDependentResources(_w,_h);
 }
 
 // Le nem kezelt, egzotikus esemény kezelése
