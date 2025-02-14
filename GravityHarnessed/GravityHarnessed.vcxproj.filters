@@ -34,6 +34,9 @@
     <Filter Include="Assets\Sun">
       <UniqueIdentifier>{324e4dcb-567a-4e25-9c5d-696c1699ec9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Post">
+      <UniqueIdentifier>{8e6defec-dbd4-4850-b98c-7c6bed02e8e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,6 +82,12 @@
     </None>
     <None Include="Shaders\Frag_Sun.frag">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Post\Post_Blending.frag">
+      <Filter>Shaders\Post</Filter>
+    </None>
+    <None Include="Shaders\Post\Post_Vertex.vert">
+      <Filter>Shaders\Post</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

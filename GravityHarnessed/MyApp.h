@@ -130,10 +130,12 @@ protected:
 	// FBO for bloom
 	void InitFBOs();
 	void CleanFBOs();
-	void InitResolutionDependentResources(int wiidth, int height);
+	void InitResolutionDependentResources(int width, int height);
 	void CleanResolutionDependentResources();
 	GLuint m_ImageFBO = 0;
 	GLuint m_colorBuffers[2] = { 0,0 };
+	GLuint m_ProgramBlendingPostID = 0;
+	GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
 
 };

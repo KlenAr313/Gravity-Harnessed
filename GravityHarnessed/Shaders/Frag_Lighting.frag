@@ -6,7 +6,8 @@ in vec3 vs_out_norm;
 in vec2 vs_out_tex;
 
 // kimenő érték - a fragment színe
-out vec4 fs_out_col;
+layout (location = 0) out vec4 fs_out_col;
+layout (location = 1) out vec4 fs_out_justSun;
 
 // textúra mintavételező objektum
 uniform sampler2D colorTexImage;
@@ -93,4 +94,6 @@ void main()
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );
 	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * texture(colorTexImage, vs_out_tex);
+	
+	fs_out_justSun = vec4(0.0, 0.0, 0.0, 1.0);
 }

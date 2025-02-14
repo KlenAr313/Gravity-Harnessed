@@ -54,6 +54,13 @@ void CMyApp::InitShaders()
 		.ShaderStage(GL_VERTEX_SHADER, "Shaders/SkyBox/Vert_skybox.vert")
 		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/SkyBox/Frag_skybox.frag")
 		.Link();
+
+	// Blending PostProcess
+	m_ProgramBlendingPostID = glCreateProgram();
+	ProgramBuilder{ m_ProgramBlendingPostID }
+		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Post/Post_Vertex.vert")
+		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Post/Post_Blending.frag")
+		.Link();
 }
 
 void CMyApp::CleanShaders()
@@ -264,7 +271,8 @@ void CMyApp::CleanFBOs()
 
 void CMyApp::InitResolutionDependentResources(int width, int height)
 {
-	//glBindFramebuffer(GL_FRAMEBUFFER, m_ImageFBO);
+	//TODO DEPTH ATTACHMENT
+	glBindFramebuffer(GL_FRAMEBUFFER, m_ImageFBO);
 	glCreateTextures(GL_TEXTURE_2D, 2, m_colorBuffers);
 	for (unsigned int i = 0; i < 2; i++)
 	{
@@ -275,8 +283,8 @@ void CMyApp::InitResolutionDependentResources(int width, int height)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_colorBuffers[i], 0);
-		glNamedFramebufferTexture(m_ImageFBO, GL_COLOR_ATTACHMENT0, m_colorBuffers[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_colorBuffers[i], 0);
+		//glNamedFramebufferTexture(m_ImageFBO, GL_COLOR_ATTACHMENT0, m_colorBuffers[i], 0);
 	}
 
 	GLenum status = glCheckNamedFramebufferStatus(m_ImageFBO, GL_FRAMEBUFFER);
@@ -359,13 +367,36 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 void CMyApp::Render()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, m_ImageFBO);
+	glDrawBuffers(2, attachments);
 	// töröljük a frampuffert (GL_COLOR_BUFFER_BIT)...
 	// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//RenderEarth();
+	RenderSkybox();
+
+	RenderEarth();
 
 	RenderSun();
+
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindVertexArray(0);
+
+	glUseProgram(m_ProgramBlendingPostID);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffers[0]);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffers[1]);
+
+	glUniform1i(ul("fullScreen"), 0);
+	glUniform1i(ul("justSun"), 1);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 
 	// shader kikapcsolasa
 	glUseProgram( 0 );
@@ -378,7 +409,6 @@ void CMyApp::Render()
 	// VAO kikapcsolása
 	glBindVertexArray( 0 );
 
-	RenderSkybox();
 }
 
 void CMyApp::RenderSun()
@@ -626,6 +656,9 @@ void CMyApp::Resize(int _w, int _h)
 {
 	glViewport(0, 0, _w, _h);
 	m_camera.SetAspect( static_cast<float>(_w) / _h );
+
+	glUseProgram(m_ProgramBlendingPostID);
+	glUniform2f(ul("res"), static_cast<float>(_w), static_cast<float>(_h));
 
 	CleanResolutionDependentResources();
 	InitResolutionDependentResources(_w,_h);
